@@ -26,6 +26,15 @@
       <version>${mysql.version}</version>
     </dependency>
 
+
+    <!-- Validationss -->
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.2</version>
+    </dependency>
+
+
     <!-- Jakarta Persistence API -->
     <dependency>
       <groupId>jakarta.persistence</groupId>

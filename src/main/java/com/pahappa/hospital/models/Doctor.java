@@ -2,6 +2,7 @@ package com.pahappa.hospital.models;
 
 import com.pahappa.hospital.enums.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "doctors")
@@ -29,6 +30,10 @@ public class Doctor {
     @Column(nullable = false)
     private Speciality speciality;
 
+    @Column(nullable = false)
+    @Filter(name = "deletedDoctorFilter", condition = "deleted = :isDeleted")
+    private boolean deleted = false;
+
 
     //constructors
     public Doctor() {}
@@ -39,6 +44,7 @@ public class Doctor {
         this.doctorPhoneNumber = doctorPhoneNumber;
         this.shift = shift;
         this.speciality = speciality;
+        this.deleted = false;
     }
 
     //getters and setters
@@ -82,6 +88,13 @@ public class Doctor {
     }
     public void setSpeciality(Speciality speciality) {
         this.speciality = speciality;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
 
