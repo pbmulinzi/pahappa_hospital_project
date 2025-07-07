@@ -7,13 +7,12 @@ import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "patients")
-@Filter(name = "deletedPatientFilter", condition = "deleted = :isDeleted")
 public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "patient_id")
-    private int patientId;
+    private Long patientId;
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String patientFirstName;
@@ -35,7 +34,7 @@ public class Patient {
     // Constructors
     public Patient() {}
 
-    public Patient(int patientId, String patientFirstName, String patientLastName, String patientPhoneNumber, Gender gender) {
+    public Patient(Long patientId, String patientFirstName, String patientLastName, String patientPhoneNumber, Gender gender) {
         this.patientId = patientId;
         this.patientFirstName = patientFirstName;
         this.patientLastName = patientLastName;
@@ -45,11 +44,11 @@ public class Patient {
     }
 
     // Getters and Setters
-    public int getPatientId() {
+    public Long getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(int patientId) {
+    public void setPatientId(Long patientId) {
         this.patientId = patientId;
     }
 

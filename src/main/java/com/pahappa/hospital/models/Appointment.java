@@ -4,7 +4,7 @@ import com.pahappa.hospital.enums.AppointmentStatus;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Filter;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "appointments")
@@ -13,7 +13,7 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "appointment_id")
-    private int appointmentId;
+    private Long appointmentId;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
@@ -24,7 +24,7 @@ public class Appointment {
     private Doctor doctor;
 
     @Column(name = "appointment_date", nullable = false)
-    private LocalDateTime appointmentDateTime;
+    private LocalDate appointmentDate;
 
     @Column(name = "reason", nullable = false, length = 500)
     private String reason;
@@ -43,22 +43,22 @@ public class Appointment {
     // Constructors
     public Appointment() {}
 
-    public Appointment(Patient patient, Doctor doctor, LocalDateTime appointmentDateTime,
+    public Appointment(Patient patient, Doctor doctor, LocalDate appointmentDate,
                        String reason, AppointmentStatus status) {
         this.patient = patient;
         this.doctor = doctor;
-        this.appointmentDateTime = appointmentDateTime;
+        this.appointmentDate = appointmentDate;
         this.reason = reason;
         this.status = status;
         this.deleted = false;
     }
 
     // Getters and Setters
-    public int getAppointmentId() {
+    public Long getAppointmentId() {
         return appointmentId;
     }
 
-    public void setAppointmentId(int appointmentId) {
+    public void setAppointmentId(Long appointmentId) {
         this.appointmentId = appointmentId;
     }
 
@@ -78,12 +78,12 @@ public class Appointment {
         this.doctor = doctor;
     }
 
-    public LocalDateTime getAppointmentDateTime() {
-        return appointmentDateTime;
+    public LocalDate getAppointmentDate() {
+        return appointmentDate;
     }
 
-    public void setAppointmentDateTime(LocalDateTime appointmentDateTime) {
-        this.appointmentDateTime = appointmentDateTime;
+    public void setAppointmentDate(LocalDate appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
 
     public String getReason() {
@@ -119,8 +119,8 @@ public class Appointment {
     }
 
     // Utility method
-    public String getFormattedDateTime() {
-        return appointmentDateTime.toString(); // Format as needed
+    public String getFormattedDate() {
+        return appointmentDate.toString(); // Format as needed
     }
 
     // toString
@@ -129,7 +129,7 @@ public class Appointment {
         return "Appointment [ID=" + appointmentId +
                 ", Patient=" + patient.getPatientFirstName() + " " + patient.getPatientLastName() +
                 ", Doctor=" + doctor.getDoctorFirstName() + " " + doctor.getDoctorLastName() +
-                ", Date/Time=" + getFormattedDateTime() +
+                ", Date=" + getFormattedDate() +
                 ", Status=" + status + "]";
     }
 }
