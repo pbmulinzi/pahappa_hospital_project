@@ -15,7 +15,7 @@ public class Billing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bill_id")
-    private int billId;
+    private Long billId;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
@@ -65,11 +65,11 @@ public class Billing {
     }
 
     // Getters and setters
-    public int getBillId() {
+    public Long getBillId() {
         return billId;
     }
 
-    public void setBillId(int billId) {
+    public void setBillId(Long billId) {
         this.billId = billId;
     }
 

@@ -13,7 +13,7 @@ public class Staff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "staff_id")
-    private int staffId;
+    private Long staffId;
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
@@ -55,11 +55,11 @@ public class Staff {
     }
 
     // Getters and Setters
-    public int getStaffId() {
+    public Long getStaffId() {
         return staffId;
     }
 
-    public void setStaffId(int staffId) {
+    public void setStaffId(Long staffId) {
         this.staffId = staffId;
     }
 

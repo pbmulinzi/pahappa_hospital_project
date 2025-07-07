@@ -2,7 +2,6 @@ package com.pahappa.hospital.models;
 
 import com.pahappa.hospital.enums.*;
 import jakarta.persistence.*;
-import org.hibernate.annotations.Filter;
 
 @Entity
 @Table(name = "doctors")
@@ -11,7 +10,7 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "doctor_id")
-    private int doctorId;
+    private Long doctorId;
 
     @Column(name = "first_name", nullable = false, length = 50)
     private String doctorFirstName;
@@ -31,13 +30,12 @@ public class Doctor {
     private Speciality speciality;
 
     @Column(nullable = false)
-    @Filter(name = "deletedDoctorFilter", condition = "deleted = :isDeleted")
     private boolean deleted = false;
 
 
     //constructors
     public Doctor() {}
-    public Doctor(int doctorId, String doctorFirstName, String doctorLastName, String doctorPhoneNumber, Shift shift, Speciality speciality) {
+    public Doctor(Long doctorId, String doctorFirstName, String doctorLastName, String doctorPhoneNumber, Shift shift, Speciality speciality) {
         this.doctorId = doctorId;
         this.doctorFirstName = doctorFirstName;
         this.doctorLastName = doctorLastName;
@@ -48,10 +46,10 @@ public class Doctor {
     }
 
     //getters and setters
-    public int getDoctorId() {
-        return doctorId;
+    public Long getDoctorId() {
+        return  doctorId;
     }
-    public void setDoctorId(int doctorId) {
+    public void setDoctorId(Long doctorId) {
         this.doctorId = doctorId;
     }
 

@@ -13,7 +13,7 @@ public class MedicalRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "record_id")
-    private int recordId;
+    private Long recordId;
 
     @ManyToOne
     @JoinColumn(name = "patient_id", nullable = false)
@@ -59,11 +59,11 @@ public class MedicalRecord {
     }
 
     // Getters and setters
-    public int getRecordId() {
+    public Long getRecordId() {
         return recordId;
     }
 
-    public void setRecordId(int recordId) {
+    public void setRecordId(Long recordId) {
         this.recordId = recordId;
     }
 
