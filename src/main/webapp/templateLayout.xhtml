@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><ui:insert name="title">Pahappa HMS</ui:insert></title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <ui:insert name="styles"></ui:insert>
+</h:head>
+<h:body class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-400 to-pink-300">
+    <!-- Check if user is logged in -->
+    <f:event type="preRenderView" listener="#{loginBean.checkLogin()}" />
+
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+
+    <!-- Messages for global notifications -->
+    <div class="container mx-auto px-4 pt-4">
+        <p:messages id="globalMessages" showDetail="true" closable="true"
+                    styleClass="mb-4 rounded-lg"
+                    infoClass="p-message-info bg-blue-100 border-blue-300 text-blue-700"
+                    warnClass="p-message-warn bg-yellow-100 border-yellow-300 text-yellow-700"
+                    errorClass="p-message-error bg-red-100 border-red-300 text-red-700"
+                    fatalClass="p-message-fatal bg-red-100 border-red-300 text-red-700"/>
+    </div>
+
+    <!-- Main content area -->
+    <div class="container mx-auto px-4 py-8">
+        <ui:insert name="content">
+            <div class="bg-white/90 rounded-2xl shadow-2xl p-8 backdrop-blur-md border border-white/30">
+                <h1 class="text-3xl font-bold text-gray-800 mb-4">Page Content</h1>
+                <p class="text-gray-600">This is the default content area.</p>
+            </div>
+        </ui:insert>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white/80 backdrop-blur-md border-t border-gray-200 mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="text-center text-gray-600">
+                <p>&copy; 2024 Pahappa HMS. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <ui:insert name="scripts"></ui:insert>
+</h:body>
+</html>

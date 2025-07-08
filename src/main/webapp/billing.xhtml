@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Billing Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .billing-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .currency-input .ui-inputtext {
+            text-align: right;
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-white">Billing Management</h1>
+        </div>
+
+        <!-- Search Panel -->
+        <p:panel header="Search Bills" styleClass="mb-6 billing-card">
+            <h:form id="searchForm" styleClass="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <p:outputLabel for="patientSearch" value="Search by Patient" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputText id="patientSearch" value="#{billingBean.searchQuery}"
+                                 styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"
+                                 placeholder="Enter patient name"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="statusSearch" value="Payment Status" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="statusSearch" value="#{billingBean.searchStatus}"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItem itemLabel="All Statuses" itemValue="#{null}" />
+                        <f:selectItems value="#{billingBean.allPaymentStatuses}" var="status"
+                                       itemLabel="#{status}" itemValue="#{status}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="flex items-end">
+                    <p:commandButton value="Search"
+                                     icon="pi pi-search"
+                                     styleClass="bg-purple-600 hover:bg-purple-700 text-white py-2.5 px-6 rounded-lg action-button mr-2"
+                                     action="#{billingBean.searchByPatientName}"
+                                     update=":billingListForm:billingTable"/>
+                </div>
+            </h:form>
+        </p:panel>
+
+        <!-- Billing Form -->
+        <p:panel header="#{billingBean.billing.billId == null ? 'Add New Bill' : 'Edit Bill'}"
+                 styleClass="mb-6 billing-card"
+                 rendered="#{billingBean.billing != null}">
+            <h:form id="billingForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Patient Selection -->
+                <div class="md:col-span-2">
+                    <p:outputLabel for="patient" value="Patient *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="patient" value="#{billingBean.billing.patient}"
+                                     required="true" requiredMessage="Patient is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"
+                                     converter="patientConverter">
+                        <f:selectItem itemLabel="Select Patient" itemValue="#{null}" />
+                        <!-- Patient items would be populated from PatientService -->
+                    </p:selectOneMenu>
+                </div>
+
+                <!-- Dates -->
+                <div>
+                    <p:outputLabel for="issueDate" value="Issue Date *" styleClass="block text-gray-300 mb-2"/>
+                    <p:calendar id="issueDate" value="#{billingBean.billing.issueDate}"
+                                required="true" requiredMessage="Issue date is required"
+                                pattern="yyyy-MM-dd" navigator="true"
+                                styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="dueDate" value="Due Date *" styleClass="block text-gray-300 mb-2"/>
+                    <p:calendar id="dueDate" value="#{billingBean.billing.dueDate}"
+                                required="true" requiredMessage="Due date is required"
+                                pattern="yyyy-MM-dd" navigator="true"
+                                styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"/>
+                </div>
+
+                <!-- Amounts -->
+                <div>
+                    <p:outputLabel for="totalAmount" value="Total Amount *" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputNumber id="totalAmount" value="#{billingBean.billing.totalAmount}"
+                                   required="true" requiredMessage="Total amount is required"
+                                   styleClass="w-full currency-input"
+                                   decimalSeparator="." thousandSeparator=","
+                                    symbol="$" symbolPosition="p">
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </p:inputNumber>
+                </div>
+
+                <div>
+                    <p:outputLabel for="amountPaid" value="Amount Paid" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputNumber id="amountPaid" value="#{billingBean.billing.amountPaid}"
+                                   styleClass="w-full currency-input"
+                                   decimalSeparator="." thousandSeparator=","
+                                   symbol="$" symbolPosition="p" >
+                    </p:inputNumber>
+                </div>
+
+                <!-- Payment Info -->
+                <div>
+                    <p:outputLabel for="paymentStatus" value="Payment Status" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="paymentStatus" value="#{billingBean.billing.paymentStatus}"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItems value="#{billingBean.allPaymentStatuses}" var="status"
+                                       itemLabel="#{status}" itemValue="#{status}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="paymentMethod" value="Payment Method" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="paymentMethod" value="#{billingBean.billing.paymentMethod}"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItems value="#{billingBean.allPaymentMethods}" var="method"
+                                       itemLabel="#{method}" itemValue="#{method}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <!-- Description -->
+                <div class="md:col-span-2">
+                    <p:outputLabel for="description" value="Description" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputTextarea id="description" value="#{billingBean.billing.description}"
+                                     rows="3" autoResize="true"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="md:col-span-2 flex justify-end mt-4 space-x-3">
+                    <p:commandButton value="#{billingBean.billing.billId == null ? 'Save' : 'Update'}"
+                                     icon="pi pi-save"
+                                     styleClass="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg action-button"
+                                     action="#{billingBean.saveBilling}"
+                                     update=":billingListForm:billingTable, :messages"/>
+                </div>
+            </h:form>
+        </p:panel>
+
+        <!-- Billing Table -->
+        <p:panel header="Bill List" styleClass="billing-card">
+            <h:form id="billingListForm">
+                <p:messages id="messages" showDetail="true" closable="true" />
+
+                <p:dataTable id="billingTable"
+                             value="#{billingBean.billingList}"
+                             var="bill"
+                             styleClass="w-full"
+                             rowStyleClass="#{bill.deleted ? 'bg-red-900/20' : ''}"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             rows="10"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <!-- Columns -->
+                    <p:column headerText="ID" styleClass="text-center" style="width:80px">
+                        <h:outputText value="#{bill.billId}" />
+                    </p:column>
+
+                    <p:column headerText="Patient" sortBy="#{bill.patient.patientLastName}">
+                        <h:outputText value="#{bill.patient.patientLastName}, #{bill.patient.patientFirstName}" />
+                    </p:column>
+
+                    <p:column headerText="Issue Date" styleClass="text-center">
+                        <h:outputText value="#{bill.issueDate}">
+                            <f:convertDateTime pattern="MMM dd, yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Due Date" styleClass="text-center">
+                        <h:outputText value="#{bill.dueDate}">
+                            <f:convertDateTime pattern="MMM dd, yyyy" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Total" styleClass="text-right">
+                        <h:outputText value="#{bill.totalAmount}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Paid" styleClass="text-right">
+                        <h:outputText value="#{bill.amountPaid}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Balance" styleClass="text-right">
+                        <h:outputText value="#{bill.balanceDue}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Status" styleClass="text-center">
+                        <p:tag value="#{bill.paymentStatus}"
+                               severity="#{bill.paymentStatus == 'PAID' ? 'success' :
+                                         bill.paymentStatus == 'PARTIAL' ? 'warning' : 'danger'}"/>
+                    </p:column>
+
+                    <p:column headerText="Actions" styleClass="text-center" style="width:180px">
+                        <div class="flex justify-center space-x-2">
+                            <!-- Edit Button -->
+                            <p:commandButton icon="pi pi-pencil"
+                                             styleClass="p-button-rounded p-button-text p-button-warning action-button"
+                                             title="Edit"
+                                             action="#{billingBean.editBilling(bill)}"
+                                             update=":billingForm"/>
+
+                            <!-- Delete Button -->
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="p-button-rounded p-button-text p-button-danger action-button"
+                                             title="Delete"
+                                             action="#{billingBean.deleteBilling(bill.billId)}"
+                                             update=":billingListForm:billingTable, :messages"/>
+
+                            <!-- Record Payment Button -->
+                            <p:commandButton icon="pi pi-dollar"
+                                             styleClass="p-button-rounded p-button-text p-button-success action-button"
+                                             title="Record Payment"
+                                             action="#{billingBean.recordPayment()}"
+                                             update=":billingListForm:billingTable, :messages"
+                                             rendered="#{bill.balanceDue > 0}"/>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </div>
+
+
+</h:body>
+</html>

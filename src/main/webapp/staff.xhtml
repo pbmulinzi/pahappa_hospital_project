@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Staff Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .staff-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-white">Staff Management</h1>
+            <p:commandButton value="Add New Staff"
+                             icon="pi pi-user-plus"
+                             styleClass="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg action-button"
+                             action="#{staffBean.saveStaff()}"
+                             update=":staffForm"/>
+        </div>
+
+        <!-- Search Panel -->
+        <p:panel header="Search Staff" styleClass="mb-6 staff-card">
+            <h:form id="searchForm" styleClass="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <p:outputLabel for="nameSearch" value="Search by Name" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputText id="nameSearch" value="#{staffBean.searchQuery}"
+                                 styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"
+                                 placeholder="Enter staff name"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="roleSearch" value="Role" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="roleSearch" value="#{staffBean.searchRole}"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="All Roles" itemValue="#{null}" />
+                        <f:selectItems value="#{staffBean.allRoles}" var="role"
+                                       itemLabel="#{role}" itemValue="#{role}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="deptSearch" value="Department" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="deptSearch" value="#{staffBean.searchDepartment}"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"
+                                     filter="true" filterMatchMode="contains">
+                        <f:selectItem itemLabel="All Departments" itemValue="#{null}" />
+                        <f:selectItems value="#{staffBean.allDepartments}" var="dept"
+                                       itemLabel="#{dept}" itemValue="#{dept}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="flex items-end">
+                    <p:commandButton value="Search"
+                                     icon="pi pi-search"
+                                     styleClass="bg-purple-600 hover:bg-purple-700 text-white py-2.5 px-6 rounded-lg action-button"
+                                     action="#{staffBean.searchStaffByName}"
+                                     update=":staffListForm:staffTable"/>
+                </div>
+            </h:form>
+        </p:panel>
+
+        <!-- Staff Form -->
+        <p:panel header="#{staffBean.staff.staffId == null ? 'Add New Staff' : 'Edit Staff'}"
+                 styleClass="mb-6 staff-card"
+                 rendered="#{staffBean.staff != null}">
+            <h:form id="staffForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p:outputLabel for="firstName" value="First Name *" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputText id="firstName" value="#{staffBean.staff.firstName}"
+                                 required="true" requiredMessage="First name is required"
+                                 styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="lastName" value="Last Name *" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputText id="lastName" value="#{staffBean.staff.lastName}"
+                                 required="true" requiredMessage="Last name is required"
+                                 styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="phone" value="Phone Number *" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputMask id="phone" value="#{staffBean.staff.phoneNumber}"
+                                 mask="999-999-9999" placeholder="___-___-____"
+                                 required="true" requiredMessage="Phone number is required"
+                                 styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="role" value="Role *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="role" value="#{staffBean.staff.role}"
+                                     required="true" requiredMessage="Role is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItems value="#{staffBean.allRoles}" var="role"
+                                       itemLabel="#{role}" itemValue="#{role}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="department" value="Department *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="department" value="#{staffBean.staff.department}"
+                                     required="true" requiredMessage="Department is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItems value="#{staffBean.allDepartments}" var="dept"
+                                       itemLabel="#{dept}" itemValue="#{dept}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="shift" value="Shift *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="shift" value="#{staffBean.staff.shift}"
+                                     required="true" requiredMessage="Shift is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItems value="#{staffBean.allShifts}" var="shift"
+                                       itemLabel="#{shift}" itemValue="#{shift}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="md:col-span-2 flex justify-end mt-4 space-x-3">
+                    <p:commandButton value="#{staffBean.staff.staffId == null ? 'Save' : 'Update'}"
+                                     icon="pi pi-save"
+                                     styleClass="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg action-button"
+                                     action="#{staffBean.saveStaff}"
+                                     update=":staffListForm:staffTable, :messages"/>
+                    <p:commandButton value="Cancel"
+                                     icon="pi pi-times"
+                                     styleClass="bg-gray-600 hover:bg-gray-700 text-white py-3 px-8 rounded-lg action-button"
+                                     action="#{staffBean.saveStaff()}"
+                                     immediate="true"/>
+                </div>
+            </h:form>
+        </p:panel>
+
+        <!-- Staff Table -->
+        <p:panel header="Staff List" styleClass="staff-card">
+            <h:form id="staffListForm">
+                <p:messages id="messages" showDetail="true" closable="true" />
+
+                <p:dataTable id="staffTable"
+                             value="#{staffBean.staffList}"
+                             var="staff"
+                             styleClass="w-full"
+                             rowStyleClass="#{staff.deleted ? 'bg-red-900/20' : ''}"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             rows="10"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <p:column headerText="ID" styleClass="text-center" style="width:80px">
+                        <h:outputText value="#{staff.staffId}" />
+                    </p:column>
+
+                    <p:column headerText="Name" sortBy="#{staff.lastName}">
+                        <h:outputText value="#{staff.lastName}, #{staff.firstName}" />
+                    </p:column>
+
+                    <p:column headerText="Phone" styleClass="text-center">
+                        <h:outputText value="#{staff.phoneNumber}" />
+                    </p:column>
+
+                    <p:column headerText="Role" sortBy="#{staff.role}">
+                        <h:outputText value="#{staff.role}" />
+                    </p:column>
+
+                    <p:column headerText="Department" sortBy="#{staff.department}">
+                        <h:outputText value="#{staff.department}" />
+                    </p:column>
+
+                    <p:column headerText="Shift" sortBy="#{staff.shift}">
+                        <h:outputText value="#{staff.shift}" />
+                    </p:column>
+
+                    <p:column headerText="Status" styleClass="text-center">
+                        <p:tag value="#{staff.deleted ? 'Inactive' : 'Active'}"
+                               severity="#{staff.deleted ? 'danger' : 'success'}"/>
+                    </p:column>
+
+                    <p:column headerText="Actions" styleClass="text-center" style="width:150px">
+                        <div class="flex justify-center space-x-2">
+                            <!-- Edit Button -->
+                            <p:commandButton icon="pi pi-pencil"
+                                             styleClass="p-button-rounded p-button-text p-button-warning action-button"
+                                             title="Edit"
+                                             rendered="#{!staff.deleted}"
+                                             action="#{staffBean.editStaff(staff)}"
+                                             update=":staffForm"/>
+
+                            <!-- Delete Button -->
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="p-button-rounded p-button-text p-button-danger action-button"
+                                             title="Delete"
+                                             rendered="#{!staff.deleted}"
+                                             action="#{staffBean.deleteStaff(staff.staffId)}"
+                                             update=":staffListForm:staffTable, :messages"/>
+
+                            <!-- Restore Button -->
+                            <p:commandButton icon="pi pi-history"
+                                             styleClass="p-button-rounded p-button-text p-button-success action-button"
+                                             title="Restore"
+                                             rendered="#{staff.deleted}"
+                                             action="#{staffBean.restoreStaff}"
+                                             update=":staffListForm:staffTable, :messages">
+                                <f:setPropertyActionListener target="#{staffBean.selectedStaffId}" value="#{staff.staffId}" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+    </div>
+
+    <!-- Initialize StaffBean -->
+    <f:event type="preRenderComponent" listener="#{staffBean.init()}"/>
+</h:body>
+</html>

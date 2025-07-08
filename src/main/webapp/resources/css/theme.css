@@ -1,0 +1,23 @@
+/* Custom theme fallback */
+body {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+    background-attachment: fixed;
+}
+
+.login-card {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.login-btn {
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+}
+
+.login-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, #2563eb, #7c3aed);
+}

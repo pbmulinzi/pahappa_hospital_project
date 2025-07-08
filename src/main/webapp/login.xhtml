@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Login - Pahappa HMS</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            background-attachment: fixed;
+        }
+        .login-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        .login-btn {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        }
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <div class="login-card rounded-2xl p-8 md:p-10">
+            <h:form>
+                <f:event type="preRenderComponent" listener="#{loginBean.initializeAdmin()}"/>
+                <h1 class="text-4xl font-extrabold mb-3 text-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Pahappa HMS</h1>
+                <p class="text-lg text-center text-gray-600 mb-8">Sign into your account</p>
+
+                <!-- Messages with better styling -->
+                <p:messages id="messages" showDetail="true" closable="true"
+                            styleClass="mb-6 rounded-lg"
+                            infoClass="p-message-info bg-blue-100 border-blue-300 text-blue-700"
+                            errorClass="p-message-error bg-red-100 border-red-300 text-red-700"/>
+
+                <div class="space-y-6">
+                    <div>
+                        <p:outputLabel for="username" value="Username" class="block font-medium mb-1 text-gray-700"/>
+                        <p:inputText id="username" value="#{loginBean.username}" required="true"
+                                     placeholder="Enter your username"
+                                     styleClass="w-full border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"/>
+                    </div>
+                    <div>
+                        <p:outputLabel for="password" value="Password" class="block font-medium mb-1 text-gray-700"/>
+                        <p:password id="password" value="#{loginBean.password}" required="true" feedback="false"
+                                    placeholder="Enter your password"
+                                    styleClass="w-full border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"/>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-8">
+                    <p:commandButton id="loginButton" value="Login" action="#{loginBean.login}"
+                                     styleClass="login-btn text-white font-bold py-3 px-8 rounded-lg shadow-md" />
+                </div>
+            </h:form>
+        </div>
+    </div>
+</h:body>
+</html>
+

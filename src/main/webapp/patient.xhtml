@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Patient Management - Pahappa HMS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .gradient-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-button:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-400 to-pink-300">
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header Section -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-extrabold mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-400 bg-clip-text text-transparent">
+                            Patient Management
+                        </h1>
+                        <p class="text-gray-600">Register and manage patient information and history</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Panel -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Search Patients
+                </h3>
+                <h:form id="searchForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <p:outputLabel for="nameSearch" value="Search by Name" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="nameSearch" value="#{patientBean.searchQuery}"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                     placeholder="Enter patient name"/>
+                    </div>
+
+                    <div class="flex items-end">
+                        <p:commandButton value="Search"
+                                         icon="pi pi-search"
+                                         styleClass="gradient-button text-white py-3 px-6 rounded-lg shadow-lg action-button"
+                                         action="#{patientBean.searchPatientByName}"
+                                         update=":patientListForm:patientTable"/>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Patient Form -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                    </svg>
+                    #{patientBean.patient.patientId == null ? 'Add New Patient' : 'Edit Patient'}
+                </h3>
+                <h:form id="patientForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p:outputLabel for="firstName" value="First Name *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="firstName" value="#{patientBean.patient.patientFirstName}"
+                                     required="true" requiredMessage="First name is required"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="lastName" value="Last Name *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="lastName" value="#{patientBean.patient.patientLastName}"
+                                     required="true" requiredMessage="Last name is required"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-transparent"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="phone" value="Phone Number *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="phone" value="#{patientBean.patient.patientPhoneNumber}"
+                                     required="true" requiredMessage="Phone number is required"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                     placeholder="Enter phone number"/>
+                        <p:message for="phone" styleClass="text-red-500 text-sm mt-1"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="gender" value="Gender *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:selectOneMenu id="gender" value="#{patientBean.patient.gender}"
+                                         required="true" requiredMessage="Gender is required"
+                                         styleClass="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+                            <f:selectItem itemLabel="Select Gender" itemValue="#{null}" />
+                            <f:selectItem itemLabel="Male" itemValue="MALE"/>
+                            <f:selectItem itemLabel="Female" itemValue="FEMALE"/>
+                            <f:selectItem itemLabel="Other" itemValue="OTHER"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="md:col-span-2 flex justify-end mt-6 space-x-3">
+                        <p:commandButton value="#{patientBean.patient.patientId == null ? 'Save' : 'Update'}"
+                                         icon="pi pi-save"
+                                         styleClass="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-lg shadow-lg action-button"
+                                         action="#{patientBean.savePatient}"
+                                         update=":patientListForm:patientTable, :messages"/>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Patient Table -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Patient List
+                </h3>
+                <h:form id="patientListForm">
+                    <p:messages id="messages" showDetail="true" closable="true"
+                                styleClass="mb-4 p-4 rounded-lg"/>
+
+                    <p:dataTable id="patientTable"
+                                 value="#{patientBean.patientList}"
+                                 var="pat"
+                                 styleClass="w-full bg-white rounded-lg shadow-sm overflow-hidden"
+                                 rowStyleClass="#{pat.deleted ? 'bg-red-50' : 'hover:bg-gray-50'}"
+                                 paginator="true"
+                                 paginatorPosition="bottom"
+                                 rows="10"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="No patients found">
+
+                        <p:column headerText="ID" styleClass="text-center font-medium text-gray-700" style="width:80px">
+                            <h:outputText value="#{pat.patientId}" styleClass="text-blue-600 font-semibold"/>
+                        </p:column>
+
+                        <p:column headerText="Name" sortBy="#{pat.patientLastName}" styleClass="font-medium text-gray-800">
+                            <h:outputText value="#{pat.patientLastName}, #{pat.patientFirstName}" />
+                        </p:column>
+
+                        <p:column headerText="Phone" styleClass="text-center text-gray-600">
+                            <h:outputText value="#{pat.patientPhoneNumber}" />
+                        </p:column>
+
+                        <p:column headerText="Gender" sortBy="#{pat.gender}" styleClass="text-center text-gray-700">
+                            <h:outputText value="#{pat.gender}" />
+                        </p:column>
+
+                        <p:column headerText="Status" styleClass="text-center">
+                            <p:tag value="#{pat.deleted ? 'Inactive' : 'Active'}"
+                                   severity="#{pat.deleted ? 'danger' : 'success'}"
+                                   styleClass="font-medium"/>
+                        </p:column>
+
+                        <p:column headerText="Actions" styleClass="text-center" style="width:200px">
+                            <div class="flex justify-center space-x-2">
+                                <p:commandButton icon="pi pi-pencil"
+                                                 styleClass="p-button-rounded p-button-text p-button-warning action-button"
+                                                 title="Edit"
+                                                 action="#{patientBean.editPatient(pat)}"
+                                                 update=":patientForm"/>
+
+                                <p:commandButton icon="pi pi-trash"
+                                                 styleClass="p-button-rounded p-button-text p-button-danger action-button"
+                                                 title="Delete"
+                                                 action="#{patientBean.deletePatient(pat.patientId)}"
+                                                 update=":patientListForm:patientTable, :messages"/>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize PatientBean -->
+    <f:event type="preRenderComponent" listener="#{patientBean.init()}"/>
+</h:body>
+</html>
+
+
+
+
+
+

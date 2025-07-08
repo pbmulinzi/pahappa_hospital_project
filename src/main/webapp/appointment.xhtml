@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:o="http://omnifaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Appointment Management - Pahappa HMS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .appointment-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-400 to-pink-300">
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header Section -->
+            <div class="bg-white/90 rounded-2xl shadow-2xl p-8 backdrop-blur-md border border-white/30 mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-4xl font-extrabold mb-2 gradient-text">Appointment Management</h1>
+                        <p class="text-lg text-gray-600">Schedule and manage patient appointments efficiently</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Panel -->
+            <div class="bg-white/90 rounded-2xl shadow-2xl p-6 backdrop-blur-md border border-white/30 mb-8">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Search Appointments
+                </h3>
+                <h:form id="searchForm" styleClass="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                        <p:outputLabel for="patientSearch" value="Patient" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:selectOneMenu id="patientSearch" value="#{appointmentBean.selectedPatientId}"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="All Patients" itemValue="#{null}" />
+                            <f:selectItems value="#{appointmentBean.patientList}" var="patient"
+                                           itemLabel="#{patient.patientFirstName} #{patient.patientLastName}"
+                                           itemValue="#{patient.patientId}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="doctorSearch" value="Doctor" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:selectOneMenu id="doctorSearch" value="#{appointmentBean.selectedDoctorId}"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="All Doctors" itemValue="#{null}" />
+                            <f:selectItems value="#{appointmentBean.doctorList}" var="doctor"
+                                           itemLabel="#{doctor.doctorFirstName} #{doctor.doctorLastName}"
+                                           itemValue="#{doctor.doctorId}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="statusSearch" value="Status" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:selectOneMenu id="statusSearch" value="#{appointmentBean.searchStatus}"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                            <f:selectItem itemLabel="All Statuses" itemValue="#{null}" />
+                            <f:selectItems value="#{appointmentBean.getAllAppointmentStatuses()}" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="dateSearch" value="Date" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:calendar id="dateSearch"
+                                    value="#{appointmentBean.searchDate}"
+                                    pattern="yyyy-MM-dd"
+                                    styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500">
+                        </p:calendar>
+                    </div>
+
+                    <div class="lg:col-span-4 flex justify-end space-x-3 mt-4">
+                        <p:commandButton value="Search"
+                                         icon="pi pi-search"
+                                         styleClass="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 px-6 rounded-xl shadow-lg action-button"
+                                         action="#{appointmentBean.searchAppointmentsByPatient}"
+                                         update=":appointmentListForm:appointmentTable"/>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Appointment Form -->
+            <div class="bg-white/90 rounded-2xl shadow-2xl p-6 backdrop-blur-md border border-white/30 mb-8">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    #{appointmentBean.appointment.appointmentId == null ? 'Add New Appointment' : 'Edit Appointment'}
+                </h3>
+                <h:form id="appointmentForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p:outputLabel for="patient" value="Patient *" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:selectOneMenu id="patient" value="#{appointmentBean.appointment.patient}"
+                                         required="true" requiredMessage="Patient is required"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                         converter="omnifaces.SelectItemsConverter">
+                            <f:selectItems value="#{appointmentBean.patientList}" var="patient"
+                                           itemLabel="#{patient.patientFirstName} #{patient.patientLastName}"
+                                           itemValue="#{patient}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="doctor" value="Doctor *" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:selectOneMenu id="doctor" value="#{appointmentBean.appointment.doctor}"
+                                         required="true" requiredMessage="Doctor is required"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                         converter="omnifaces.SelectItemsConverter">
+                            <f:selectItems value="#{appointmentBean.doctorList}" var="doctor"
+                                           itemLabel="#{doctor.doctorFirstName} #{doctor.doctorLastName}"
+                                           itemValue="#{doctor}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="appointmentDate" value="Date *" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:calendar id="appointmentDate" value="#{appointmentBean.appointment.appointmentDate}"
+                                    pattern="yyyy-MM-dd" showTime="false"
+                                    required="true" requiredMessage="Date is required"
+                                    styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <f:converter converterId="localDateConverter" />
+                        </p:calendar>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="status" value="Status *" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:selectOneMenu id="status" value="#{appointmentBean.appointment.status}"
+                                         required="true" requiredMessage="Status is required"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <f:selectItems value="#{appointmentBean.getAllAppointmentStatuses()}" />
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <p:outputLabel for="reason" value="Reason *" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:inputTextarea id="reason" value="#{appointmentBean.appointment.reason}"
+                                         rows="3" autoResize="true"
+                                         required="true" requiredMessage="Reason is required"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <p:outputLabel for="notes" value="Notes" styleClass="block text-sm font-semibold text-gray-700 mb-2"/>
+                        <p:inputTextarea id="notes" value="#{appointmentBean.appointment.notes}"
+                                         rows="2" autoResize="true"
+                                         styleClass="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+                    </div>
+
+                    <div class="md:col-span-2 flex justify-end space-x-4 mt-6">
+                        <p:commandButton value="#{appointmentBean.appointment.appointmentId == null ? 'Save Appointment' : 'Update Appointment'}"
+                                         icon="pi pi-save"
+                                         styleClass="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-3 px-8 rounded-xl shadow-lg action-button"
+                                         action="#{appointmentBean.saveAppointment}"
+                                         update=":appointmentListForm:appointmentTable, :messages"/>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Appointment Table -->
+            <div class="bg-white/90 rounded-2xl shadow-2xl p-6 backdrop-blur-md border border-white/30">
+                <h3 class="text-2xl font-bold mb-6 text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    Appointment List
+                </h3>
+                <h:form id="appointmentListForm">
+                    <p:messages id="messages" showDetail="true" closable="true" />
+
+                    <p:dataTable id="appointmentTable"
+                                 value="#{appointmentBean.appointmentList}"
+                                 var="appt"
+                                 styleClass="w-full rounded-lg overflow-hidden shadow-lg"
+                                 rowStyleClass="#{appt.deleted ? 'bg-red-50' : 'hover:bg-gray-50'}"
+                                 paginator="true"
+                                 paginatorPosition="bottom"
+                                 rows="10"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 rowsPerPageTemplate="5,10,15">
+
+                        <p:column headerText="ID" styleClass="text-center font-semibold" style="width:80px">
+                            <h:outputText value="#{appt.appointmentId}" />
+                        </p:column>
+
+                        <p:column headerText="Patient" sortBy="#{appt.patient.patientLastName}">
+                            <h:outputText value="#{appt.patient.patientLastName}, #{appt.patient.patientFirstName}"
+                                          styleClass="font-medium text-gray-900"/>
+                        </p:column>
+
+                        <p:column headerText="Doctor" sortBy="#{appt.doctor.doctorLastName}">
+                            <h:outputText value="Dr. #{appt.doctor.doctorLastName}"
+                                          styleClass="font-medium text-gray-900"/>
+                        </p:column>
+
+                        <p:column headerText="Date/Time" styleClass="text-center">
+                            <h:outputText value="#{appointmentBean.formatDate(appt.appointmentDate)}"
+                                          styleClass="text-gray-600">
+                                <f:convertDateTime pattern="MMM dd, yyyy HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Reason" style="max-width: 200px;">
+                            <h:outputText value="#{appt.reason}"
+                                          styleClass="text-gray-600 block truncate"/>
+                        </p:column>
+
+                        <p:column headerText="Status" styleClass="text-center">
+                            <span class="status-badge
+                                #{appt.status eq 'SCHEDULED' ? 'bg-blue-500' :
+                                  appt.status eq 'COMPLETED' ? 'bg-green-500' :
+                                  appt.status eq 'CANCELLED' ? 'bg-red-500' :
+                                  'bg-yellow-500'}">
+                                #{appt.status}
+                            </span>
+                        </p:column>
+
+                        <p:column headerText="Actions" styleClass="text-center" style="width:180px">
+                            <div class="flex justify-center space-x-2">
+                                <p:commandButton icon="pi pi-pencil"
+                                                 styleClass="p-button-rounded p-button-text text-blue-600 hover:bg-blue-50 action-button"
+                                                 title="Edit"
+                                                 action="#{appointmentBean.editAppointment(appt)}"
+                                                 update=":appointmentForm"/>
+
+                                <p:commandButton icon="pi pi-times"
+                                                 styleClass="p-button-rounded p-button-text text-red-600 hover:bg-red-50 action-button"
+                                                 title="Cancel"
+                                                 rendered="#{!appt.deleted}"
+                                                 action="#{appointmentBean.deleteAppointment(appt.appointmentId)}"
+                                                 update=":appointmentListForm:appointmentTable, :messages"/>
+
+                                <p:commandButton icon="pi pi-undo"
+                                                 styleClass="p-button-rounded p-button-text text-green-600 hover:bg-green-50 action-button"
+                                                 title="Restore"
+                                                 rendered="#{appt.deleted}"
+                                                 action="#{appointmentBean.restoreAppointment}"
+                                                 update=":appointmentListForm:appointmentTable, :messages">
+                                    <f:setPropertyActionListener target="#{appointmentBean.selectedAppointmentId}"
+                                                                 value="#{appt.appointmentId}" />
+                                </p:commandButton>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Initialize AppointmentBean -->
+    <f:event type="preRenderComponent" listener="#{appointmentBean.init()}"/>
+</h:body>
+</html>
+
+
+
+
+
+
+

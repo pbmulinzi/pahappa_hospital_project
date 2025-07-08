@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Doctor Management - Pahappa HMS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        .gradient-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-button:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-400 to-pink-300">
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header Section -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-extrabold mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-400 bg-clip-text text-transparent" style="text-align: center">
+                            Doctor Management
+                        </h1>
+                        <p class="text-gray-600">Manage doctor profiles, schedules, and specializations</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Search Panel -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    Search Doctors
+                </h3>
+                <h:form id="searchForm" styleClass="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <p:outputLabel for="nameSearch" value="Search by Name" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="nameSearch" value="#{doctorBean.searchQuery}"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                     placeholder="Enter doctor name"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="specialitySearch" value="Speciality" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:selectOneMenu id="specialitySearch" value="#{doctorBean.searchSpeciality}"
+                                         styleClass="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                         filter="true" filterMatchMode="contains">
+                            <f:selectItem itemLabel="All Specialities" itemValue="#{null}" />
+                            <f:selectItems value="#{doctorBean.allSpecialities}" var="spec"
+                                           itemLabel="#{spec}" itemValue="#{spec}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="flex items-end">
+                        <p:commandButton value="Search"
+                                         icon="pi pi-search"
+                                         styleClass="gradient-button text-white py-3 px-6 rounded-lg shadow-lg action-button"
+                                         action="#{doctorBean.searchDoctors()}"
+                                         update=":doctorListForm:doctorTable"/>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Doctor Form -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                 <p:outputPanel rendered="#{doctorBean.doctor != null}" class="glass-card rounded-2xl shadow-2xl p-6 mb-8"/>                <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    #{doctorBean.doctor.doctorId == null ? 'Add New Doctor' : 'Edit Doctor'}
+                </h3>
+                <h:form id="doctorForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <p:outputLabel for="firstName" value="First Name *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="firstName" value="#{doctorBean.doctor.doctorFirstName}"
+                                     required="true" requiredMessage="First name is required"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="lastName" value="Last Name *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputText id="lastName" value="#{doctorBean.doctor.doctorLastName}"
+                                     required="true" requiredMessage="Last name is required"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="phone" value="Phone Number *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:inputMask id="phone" value="#{doctorBean.doctor.doctorPhoneNumber}"
+                                     mask="9999-999-999" placeholder="____-___-___"
+                                     required="true" requiredMessage="Phone number is required"
+                                     styleClass="w-full border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="speciality" value="Speciality *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:selectOneMenu id="speciality" value="#{doctorBean.doctor.speciality}"
+                                         required="true" requiredMessage="Speciality is required"
+                                         styleClass="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <f:selectItems value="#{doctorBean.allSpecialities}" var="spec"
+                                           itemLabel="#{spec}" itemValue="#{spec}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div>
+                        <p:outputLabel for="shift" value="Shift *" styleClass="block text-gray-700 font-medium mb-2"/>
+                        <p:selectOneMenu id="shift" value="#{doctorBean.doctor.shift}"
+                                         required="true" requiredMessage="Shift is required"
+                                         styleClass="w-full border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <f:selectItems value="#{doctorBean.allShifts}" var="shift"
+                                           itemLabel="#{shift}" itemValue="#{shift}"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="md:col-span-2 flex justify-end mt-6 space-x-3">
+                        <p:commandButton value="#{doctorBean.doctor.doctorId == null ? 'Save' : 'Update'}"
+                                         icon="pi pi-save"
+                                         styleClass="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-lg shadow-lg action-button"
+                                         action="#{doctorBean.saveDoctor()}"
+                                         update=":doctorListForm:doctorTable, :messages"/>
+                    </div>
+                </h:form>
+            </div>
+
+            <!-- Doctor Table -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    Doctor List
+                </h3>
+
+                <h:form id="doctorListForm">
+                    <p:messages id="messages" showDetail="true" closable="true"
+                                styleClass="mb-4 p-4 rounded-lg"/>
+
+                    <p:dataTable id="doctorTable"
+                                 value="#{doctorBean.doctorList}"
+                                 var="doc"
+                                 styleClass="w-full"
+                                 paginator="true"
+                                 rows="10"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 rowsPerPageTemplate="5,10,15">
+
+                        <p:column headerText="ID" styleClass="text-center font-medium text-gray-700" style="width:80px">
+                            <h:outputText value="#{doc.doctorId}" styleClass="text-blue-600 font-semibold"/>
+                        </p:column>
+
+                        <p:column headerText="Name" sortBy="#{doc.doctorLastName}" styleClass="font-medium text-gray-800">
+                            <h:outputText value="#{doc.doctorLastName}, #{doc.doctorFirstName}" />
+                        </p:column>
+
+                        <p:column headerText="Phone" styleClass="text-center text-gray-600">
+                            <h:outputText value="#{doc.doctorPhoneNumber}" />
+                        </p:column>
+
+                        <p:column headerText="Speciality" sortBy="#{doc.speciality}" styleClass="text-gray-700">
+                            <h:outputText value="#{doc.speciality}" />
+                        </p:column>
+
+                        <p:column headerText="Shift" sortBy="#{doc.shift}" styleClass="text-gray-700">
+                            <h:outputText value="#{doc.shift}" />
+                        </p:column>
+
+                        <p:column headerText="Status" styleClass="text-center">
+                            <p:tag value="#{doc.deleted ? 'Inactive' : 'Active'}"
+                                   severity="#{doc.deleted ? 'danger' : 'success'}"
+                                   styleClass="font-medium"/>
+                        </p:column>
+
+                        <p:column headerText="Actions" styleClass="text-center" style="width:150px">
+                            <div class="flex justify-center space-x-2">
+                                <p:commandButton icon="pi pi-pencil"
+                                                 styleClass="p-button-rounded p-button-text p-button-warning action-button"
+                                                 title="Edit"
+                                                 action="#{doctorBean.editDoctor(doc)}"
+                                                 update=":doctorForm :messages"
+                                                 partialSubmit="true"
+                                                 immediate="true"/>
+
+                                <p:commandButton icon="pi pi-trash"
+                                                 styleClass="p-button-rounded p-button-text p-button-danger action-button"
+                                                 title="Delete"
+                                                 action="#{doctorBean.deleteDoctor(doc.doctorId)}"
+                                                 update=":doctorListForm:doctorTable, :messages"/>
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Initialize DoctorBean -->
+    <f:event type="preRenderComponent" listener="#{doctorBean.init()}"/>
+</h:body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
