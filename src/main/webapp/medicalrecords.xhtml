@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Medical Records Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .record-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .text-summary {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+    
+    <div class="max-w-7xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-white">Medical Records Management</h1>
+            <p:commandButton value="Add New Record"
+                             icon="pi pi-plus"
+                             styleClass="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg action-button"
+                             action="#{medicalRecordBean.saveRecord()}"
+                             update=":recordForm"/>
+        </div>
+
+        <!-- Search Panel -->
+        <p:panel header="Search Records" styleClass="mb-6 record-card">
+            <h:form id="searchForm" styleClass="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <p:outputLabel for="diagnosisSearch" value="Search by Diagnosis" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputText id="diagnosisSearch" value="#{medicalRecordBean.diagnosisKeyword}"
+                                 styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"
+                                 placeholder="Enter diagnosis keyword"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="typeSearch" value="Record Type" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="typeSearch" value="#{medicalRecordBean.recordTypeSearch}"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItem itemLabel="All Types" itemValue="#{null}" />
+                        <f:selectItems value="#{medicalRecordBean.allRecordTypes}" var="type"
+                                       itemLabel="#{type}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="startDate" value="Start Date" styleClass="block text-gray-300 mb-2"/>
+                    <p:calendar id="startDate" value="#{medicalRecordBean.startDate}"
+                                pattern="yyyy-MM-dd" navigator="true"
+                                styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="endDate" value="End Date" styleClass="block text-gray-300 mb-2"/>
+                    <p:calendar id="endDate" value="#{medicalRecordBean.endDate}"
+                                pattern="yyyy-MM-dd" navigator="true"
+                                styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"/>
+                </div>
+
+                <div class="md:col-span-4 flex justify-end space-x-2">
+                    <p:commandButton value="Search by Diagnosis"
+                                     icon="pi pi-search"
+                                     styleClass="bg-purple-600 hover:bg-purple-700 text-white py-2.5 px-6 rounded-lg action-button"
+                                     action="#{medicalRecordBean.searchByDiagnosis}"
+                                     update=":recordListForm:recordTable"/>
+
+                    <p:commandButton value="Search by Type"
+                                     icon="pi pi-filter"
+                                     styleClass="bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 px-6 rounded-lg action-button"
+                                     action="#{medicalRecordBean.searchByRecordType}"
+                                     update=":recordListForm:recordTable"/>
+
+                    <p:commandButton value="Search by Date"
+                                     icon="pi pi-calendar"
+                                     styleClass="bg-teal-600 hover:bg-teal-700 text-white py-2.5 px-6 rounded-lg action-button"
+                                     action="#{medicalRecordBean.searchByDateRange}"
+                                     update=":recordListForm:recordTable"/>
+                </div>
+            </h:form>
+        </p:panel>
+
+        <!-- Medical Record Form -->
+        <p:panel header="#{medicalRecordBean.record.recordId == null ? 'Add New Medical Record' : 'Edit Medical Record'}"
+                 styleClass="mb-6 record-card"
+                 rendered="#{medicalRecordBean.record != null}">
+            <h:form id="recordForm" styleClass="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <p:outputLabel for="patient" value="Patient *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="patient" value="#{medicalRecordBean.record.patient}"
+                                     required="true" requiredMessage="Patient is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItem itemLabel="Select Patient" itemValue="#{null}" />
+                        <f:selectItems value="#{medicalRecordBean.allPatients}" var="pat"
+                                       itemLabel="#{pat.patientFirstName} #{pat.patientLastName}" itemValue="#{pat}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="doctor" value="Doctor *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="doctor" value="#{medicalRecordBean.record.doctor}"
+                                     required="true" requiredMessage="Doctor is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItem itemLabel="Select Doctor" itemValue="#{null}" />
+                        <f:selectItems value="#{medicalRecordBean.allDoctors}" var="doc"
+                                       itemLabel="#{doc.doctorFirstName} #{doc.doctorLastName}" itemValue="#{doc}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div>
+                    <p:outputLabel for="recordDate" value="Record Date *" styleClass="block text-gray-300 mb-2"/>
+                    <p:calendar id="recordDate" value="#{medicalRecordBean.record.recordDate}"
+                                required="true" requiredMessage="Record date is required"
+                                pattern="yyyy-MM-dd" navigator="true"
+                                styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg"/>
+                </div>
+
+                <div>
+                    <p:outputLabel for="recordType" value="Record Type *" styleClass="block text-gray-300 mb-2"/>
+                    <p:selectOneMenu id="recordType" value="#{medicalRecordBean.record.recordType}"
+                                     required="true" requiredMessage="Record type is required"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg">
+                        <f:selectItems value="#{medicalRecordBean.allRecordTypes}" var="type"
+                                       itemLabel="#{type}" itemValue="#{type}"/>
+                    </p:selectOneMenu>
+                </div>
+
+                <div class="md:col-span-2">
+                    <p:outputLabel for="diagnosis" value="Diagnosis *" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputTextarea id="diagnosis" value="#{medicalRecordBean.record.diagnosis}"
+                                     required="true" requiredMessage="Diagnosis is required"
+                                     rows="3" autoResize="true"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div class="md:col-span-2">
+                    <p:outputLabel for="treatment" value="Treatment" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputTextarea id="treatment" value="#{medicalRecordBean.record.treatment}"
+                                     rows="2" autoResize="true"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div class="md:col-span-2">
+                    <p:outputLabel for="prescription" value="Prescription" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputTextarea id="prescription" value="#{medicalRecordBean.record.prescription}"
+                                     rows="2" autoResize="true"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div class="md:col-span-2">
+                    <p:outputLabel for="notes" value="Notes" styleClass="block text-gray-300 mb-2"/>
+                    <p:inputTextarea id="notes" value="#{medicalRecordBean.record.notes}"
+                                     rows="2" autoResize="true"
+                                     styleClass="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-2"/>
+                </div>
+
+                <div class="md:col-span-2 flex justify-end mt-4 space-x-3">
+                    <p:commandButton value="#{medicalRecordBean.record.recordId == null ? 'Save' : 'Update'}"
+                                     icon="pi pi-save"
+                                     styleClass="bg-green-600 hover:bg-green-700 text-white py-3 px-8 rounded-lg action-button"
+                                     action="#{medicalRecordBean.saveRecord}"
+                                     update=":recordListForm:recordTable, :messages"/>
+
+                </div>
+            </h:form>
+        </p:panel>
+
+        <!-- Medical Records Table -->
+        <p:panel header="Medical Records" styleClass="record-card">
+            <h:form id="recordListForm">
+                <p:messages id="messages" showDetail="true" closable="true" />
+
+                <p:dataTable id="recordTable"
+                             value="#{medicalRecordBean.recordList}"
+                             var="rec"
+                             styleClass="w-full"
+                             rowStyleClass="#{rec.deleted ? 'bg-red-900/20' : ''}"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             rows="10"
+                             paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <p:column headerText="ID" styleClass="text-center" style="width:80px">
+                        <h:outputText value="#{rec.recordId}" />
+                    </p:column>
+
+                    <p:column headerText="Patient" sortBy="#{rec.patient.patientLastName}">
+                        <h:outputText value="#{rec.patient.patientLastName}, #{rec.patient.patientFirstName}" />
+                    </p:column>
+
+                    <p:column headerText="Doctor" sortBy="#{rec.doctor.doctorLastName}">
+                        <h:outputText value="#{rec.doctor.doctorLastName}, #{rec.doctor.doctorFirstName}" />
+                    </p:column>
+
+                    <p:column headerText="Date" styleClass="text-center" sortBy="#{rec.recordDate}">
+                        <h:outputText value="#{rec.recordDate}">
+                            <f:convertDateTime pattern="yyyy-MM-dd" />
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column headerText="Type" sortBy="#{rec.recordType}">
+                        <h:outputText value="#{rec.recordType}" />
+                    </p:column>
+
+                    <p:column headerText="Diagnosis" styleClass="text-summary">
+                        <h:outputText value="#{rec.diagnosis}" />
+                    </p:column>
+
+                    <p:column headerText="Status" styleClass="text-center">
+                        <p:tag value="#{rec.deleted ? 'Deleted' : 'Active'}"
+                               severity="#{rec.deleted ? 'danger' : 'success'}"/>
+                    </p:column>
+
+                    <p:column headerText="Actions" styleClass="text-center" style="width:150px">
+                        <div class="flex justify-center space-x-2">
+                            <p:commandButton icon="pi pi-pencil"
+                                             styleClass="p-button-rounded p-button-text p-button-warning action-button"
+                                             title="Edit"
+                                             action="#{medicalRecordBean.editRecord(rec)}"
+                                             update=":recordForm"/>
+
+                            <p:commandButton icon="pi pi-trash"
+                                             styleClass="p-button-rounded p-button-text p-button-danger action-button"
+                                             title="Delete"
+                                             action="#{medicalRecordBean.deleteRecord}"
+                                             onclick="PF('confirmDelete').show()"
+                                             update=":recordListForm:recordTable, :messages">
+                                <f:setPropertyActionListener target="#{medicalRecordBean.selectedRecordId}"
+                                                             value="#{rec.recordId}" />
+                            </p:commandButton>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+
+                <!-- Delete Confirmation Dialog -->
+                <p:confirmDialog header="Confirm Deletion"
+                                 message="Are you sure you want to delete this medical record?"
+                                 widgetVar="confirmDelete"
+                                 showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Yes"
+                                     styleClass="p-button-danger"
+                                     action="#{medicalRecordBean.deleteRecord}"
+                                     oncomplete="PF('confirmDelete').hide()"
+                                     update=":recordListForm:recordTable, :messages"/>
+                    <p:commandButton value="No"
+                                     styleClass="p-button-secondary"
+                                     onclick="PF('confirmDelete').hide()"/>
+                </p:confirmDialog>
+            </h:form>
+        </p:panel>
+    </div>
+
+    <!-- Initialize MedicalRecordBean -->
+    <f:event type="preRenderComponent" listener="#{medicalRecordBean.init()}"/>
+</h:body>
+</html>
