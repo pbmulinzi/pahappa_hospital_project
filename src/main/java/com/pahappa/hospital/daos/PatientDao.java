@@ -1,6 +1,7 @@
 package com.pahappa.hospital.daos;
 
 import com.pahappa.hospital.models.Patient;
+<<<<<<< Updated upstream
 import com.pahappa.hospital.utils.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -17,12 +18,39 @@ public class PatientDao {
     public void createPatient(Patient patient) {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
+=======
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
+import java.util.List;
+
+@ApplicationScoped
+public class PatientDao {
+
+    @Inject
+    private SessionFactory sessionFactory;
+
+    // Create a new patient
+    public void createPatient(Patient patient) throws Exception {
+        Transaction transaction = null;
+        Session session = sessionFactory.openSession();
+        try {
+>>>>>>> Stashed changes
             transaction = session.beginTransaction();
             session.persist(patient);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) transaction.rollback();
+<<<<<<< Updated upstream
             e.printStackTrace();
+=======
+            throw e;
+        } finally {
+            session.close();
+>>>>>>> Stashed changes
         }
     }
 
@@ -57,6 +85,12 @@ public class PatientDao {
     }
 
     public List<Patient> searchPatientsByName(String name) {
+<<<<<<< Updated upstream
+=======
+        if (name == null) {
+            return List.of();
+        }
+>>>>>>> Stashed changes
         try (Session session = sessionFactory.openSession()) {
             String hql = "FROM Patient p WHERE " +
                     "(LOWER(p.patientFirstName) LIKE :name OR " +
@@ -86,12 +120,20 @@ public class PatientDao {
     }
 
     // Get patient by ID (excluding deleted)
+<<<<<<< Updated upstream
 
     public Patient getPatientById(Long patientId) {
         try (Session session = sessionFactory.openSession()) {
             String hql = "FROM Patient p WHERE p.id = :id AND p.deleted = false";
             return session.createQuery(hql, Patient.class)
                     .setParameter("id", patientId)
+=======
+    public Patient getPatientById(Long patientId) {
+        try (Session session = sessionFactory.openSession()) {
+            String hql = "FROM Patient p WHERE p.patientId = :patientId AND p.deleted = false";
+            return session.createQuery(hql, Patient.class)
+                    .setParameter("patientId", patientId)
+>>>>>>> Stashed changes
                     .uniqueResult();
         }
     }
@@ -120,6 +162,7 @@ public class PatientDao {
                     .list();
         }
     }
+<<<<<<< Updated upstream
 //    public List<Patient> searchPatientsByProperty(String columnName, String value) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deletedPatientFilter")
@@ -165,5 +208,8 @@ public class PatientDao {
 //            return query.uniqueResult() > 0;
 //        }
 //    }
+=======
+
+>>>>>>> Stashed changes
 }
 
