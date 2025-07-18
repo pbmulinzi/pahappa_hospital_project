@@ -31,7 +31,7 @@ public class Appointment {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private AppointmentStatus status;
+    private AppointmentStatus status = AppointmentStatus.SCHEDULED; //default status
 
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
@@ -49,7 +49,7 @@ public class Appointment {
         this.doctor = doctor;
         this.appointmentDate = appointmentDate;
         this.reason = reason;
-        this.status = status;
+        this.status = status != null ? status : AppointmentStatus.SCHEDULED;
         this.deleted = false;
     }
 

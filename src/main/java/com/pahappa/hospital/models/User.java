@@ -3,6 +3,7 @@ package com.pahappa.hospital.models;
 import jakarta.persistence.*;
 import java.io.Serializable;
 
+
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
@@ -16,8 +17,11 @@ public class User implements Serializable {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private boolean admin;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+
 
     // Getters and setters
     public Long getId() { return id; }
@@ -29,7 +33,8 @@ public class User implements Serializable {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public boolean isAdmin() { return admin; }
-    public void setAdmin(boolean admin) { this.admin = admin; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+
 }
 
