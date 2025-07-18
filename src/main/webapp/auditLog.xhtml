@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Audit Logs - Pahappa HMS</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+
+    <style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .action-button {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+            color: #fff !important;
+            border: none !important;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #D97706, #B45309) !important;
+        }
+        .gradient-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .gradient-button:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+        .log-details {
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</h:head>
+
+<h:body class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-400 to-pink-300">
+
+    <f:event type="preRenderView" listener="#{loginBean.checkLogin}" />
+
+    <f:event type="preRenderView" listener="#{loginBean.preventBackdoorAccess}" />
+
+    <!-- Include the navbar -->
+    <ui:include src="/navbar.xhtml" />
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <!-- Header Section -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6 mb-8">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-extrabold mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-400 bg-clip-text text-transparent" style="text-align: center">
+                            Audit Logs
+                        </h1>
+                        <p class="text-gray-600">Track all system activities and changes</p>
+                    </div>
+                    <div class="flex items-end">
+                        <h:form>
+                            <p:commandButton value="Refresh Logs"
+                                             icon="pi pi-refresh"
+                                             styleClass="action-button"
+                                             action="#{auditLogBean.loadAllAuditLogs()}"
+                                             update=":auditListForm:auditTable"/>
+                        </h:form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit Log Table -->
+            <div class="glass-card rounded-2xl shadow-2xl p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                    </svg>
+                    Audit Log Entries
+                </h3>
+
+                <h:form id="auditListForm">
+                    <p:messages id="messages" showDetail="true" closable="true"
+                                styleClass="mb-4 p-4 rounded-lg"/>
+
+                    <p:dataTable id="auditTable"
+                                 value="#{auditLogBean.auditLogs}"
+                                 var="log"
+                                 styleClass="w-full"
+                                 paginator="true"
+                                 paginatorPosition="bottom"
+                                 rows="10"
+                                 paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 emptyMessage="No audit logs found">
+
+
+                        <p:column headerText="Date" sortBy="#{log.date}" filterBy="#{log.date}" filterMatchMode="exact" styleClass="text-center font-medium text-gray-700" style="width:140px">
+                            <p:calendar value="#{log.date}" pattern="yyyy-MM-dd" readonlyInput="true" showIcon="true" styleClass="font-medium w-full" disabled="true"/>
+                            <f:facet name="filter">
+                                <p:calendar id="dateFilterHeader" value="#{auditLogBean.filterDate}" pattern="yyyy-MM-dd" navigator="true" styleClass="w-full" showButtonBar="true">
+                                    <p:ajax event="dateSelect" update=":auditListForm:auditTable" listener="#{auditLogBean.applyFilters}" />
+                                </p:calendar>
+                            </f:facet>
+                        </p:column>
+
+
+                        <p:column headerText="Action" sortBy="#{log.action}" filterBy="#{log.action}" filterMatchMode="contains" styleClass="font-medium text-gray-800">
+                            <p:tag value="#{log.action}"
+                                   severity="#{log.action.contains('ERROR') ? 'danger' : log.action.contains('CREATE') ? 'success' : log.action.contains('UPDATE') ? 'warning' : 'info'}"
+                                   styleClass="font-medium"/>
+                        </p:column>
+
+                        <p:column headerText="Details" styleClass="text-gray-600">
+                            <div class="line-clamp-2">
+                                <h:outputText value="#{log.details}" />
+                            </div>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Dialog -->
+    <p:dialog header="Audit Log Details"
+              widgetVar="detailsDialog"
+              modal="true"
+              resizable="false"
+              styleClass="glass-card rounded-2xl shadow-2xl p-6 max-w-2xl">
+        <h:form id="detailsForm">
+            <h:panelGroup id="detailsPanel">
+                <h:panelGroup layout="block" styleClass="space-y-4" rendered="#{not empty auditLogBean.selectedAuditLog}">                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Log ID</p>
+                        <p class="text-lg font-semibold">#{auditLogBean.selectedAuditLog.auditLogId}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Date</p>
+                        <p class="text-lg font-semibold">
+                            <h:outputText value="#{auditLogBean.selectedAuditLog.date}">
+                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss" />
+                            </h:outputText>
+                        </p>
+                    </div>
+                </div>
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Action</p>
+                        <p:tag value="#{auditLogBean.selectedAuditLog.action}"
+                               severity="#{auditLogBean.selectedAuditLog.action.contains('ERROR') ? 'danger' : auditLogBean.selectedAuditLog.action.contains('CREATE') ? 'success' : auditLogBean.selectedAuditLog.action.contains('UPDATE') ? 'warning' : 'info'}"
+                               styleClass="text-lg font-medium"/>
+                    </div>
+
+                    <div>
+                        <p class="text-sm font-medium text-gray-500">Details</p>
+                        <div class="log-details p-4 bg-gray-50 rounded-lg mt-1">
+                            <p class="whitespace-pre-wrap">#{auditLogBean.selectedAuditLog.details}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <p:commandButton value="Close"
+                                         styleClass="action-button"
+                                         onclick="PF('detailsDialog').hide()"/>
+                    </div>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+</h:body>
+</html>
