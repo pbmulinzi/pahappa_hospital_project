@@ -2,6 +2,9 @@ package com.pahappa.hospital.beans;
 
 import com.pahappa.hospital.services.*;
 
+import com.pahappa.hospital.services.doctor.DoctorService;
+import com.pahappa.hospital.services.patient.PatientService;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
@@ -16,6 +19,16 @@ public class DashboardBean implements Serializable{
 
     DoctorService doctorService = new DoctorService();
     PatientService patientService = new PatientService();
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    private DoctorService doctorService;
+
+    @Inject
+    private PatientService patientService;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 
     private int totalDoctors;
     private int totalPatients;
@@ -51,6 +64,17 @@ public class DashboardBean implements Serializable{
         return "billing.xhtml?faces-redirect=true";
     }
 
+    public int getTotalDoctors() {
+        return totalDoctors;
+    }
+
+
+    public String navigateWithPatientId(Long patientId) {
+        return "patient-profile.xhtml?patientId="+ patientId + "&faces-redirect=true";
+    }
+
+
+    //Getters for total doctors and patients
     public int getTotalDoctors() {
         return totalDoctors;
     }
