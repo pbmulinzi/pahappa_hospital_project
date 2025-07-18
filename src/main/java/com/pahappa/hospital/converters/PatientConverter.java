@@ -1,7 +1,7 @@
 package com.pahappa.hospital.converters;
 
 import com.pahappa.hospital.models.Patient;
-import com.pahappa.hospital.services.PatientService;
+import com.pahappa.hospital.services.patient.PatientService;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.convert.Converter;
