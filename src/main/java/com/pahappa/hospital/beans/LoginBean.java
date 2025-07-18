@@ -5,6 +5,9 @@ import java.io.Serializable;
 import com.pahappa.hospital.models.User;
 import com.pahappa.hospital.services.InitializeAdminService;
 import com.pahappa.hospital.services.UserService;
+import com.pahappa.hospital.services.auditLog.AuditLogService;
+import com.pahappa.hospital.services.initializeAdmin.InitializeAdminService;
+import com.pahappa.hospital.services.user.UserService;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Inject;
@@ -18,6 +21,15 @@ import org.mindrot.jbcrypt.BCrypt;
 @SessionScoped
 public class LoginBean implements Serializable {
 
+
+    public static final long serialVersionUID = 1L; // Unique identifier for serialization
+
+    public static final String ROLE_SYSTEM_ADMIN = "System_Administrator";
+    public static final String ROLE_DOCTOR = "Doctor";
+    public static final String ROLE_RECEPTIONIST = "Receptionist";
+
+    private static final String LOGIN_ERROR = "Invalid username or password";
+
     private boolean closed;
     private String username;
     private String password;
@@ -27,6 +39,11 @@ public class LoginBean implements Serializable {
     @Inject
     private transient UserService userService; //mark as transient to avoid serialization issues because of CD
 
+    @Inject
+    private InitializeAdminService initializeAdminService;
+
+    @Inject
+    private AuditLogService auditLogService;
 
 
     @PostConstruct
@@ -144,6 +161,39 @@ public class LoginBean implements Serializable {
         }
     }
 
+
+
+    public String login() {
+        User user = userService.findByUsername(username);
+        if (user != null && validatePassword(password, user.getPassword())) {
+            this.currentUser = user;
+            this.loggedIn = true;
+
+            //redirect based on rolee
+            switch(user.getRole().getRoleName()) {
+                case ROLE_SYSTEM_ADMIN:
+                    auditLogService.logAction("LOGIN", "User " + user.getUsername() + " logged in successfully.");
+                    return "/dashboardTemplates/systemAdminDashboard.xhtml?faces-redirect=true";
+                case ROLE_DOCTOR:
+                    auditLogService.logAction("LOGIN", "User " + user.getUsername() + " logged in successfully.");
+                    return "/dashboardTemplates/doctorDashboard.xhtml?faces-redirect=true";
+                case ROLE_RECEPTIONIST:
+                    auditLogService.logAction("LOGIN", "User " + user.getUsername() + " logged in successfully.");
+                    return "/dashboardTemplates/receptionistDashboard.xhtml?faces-redirect=true";
+                default:
+                    return "/dashboardTemplates/dashboard.xhtml?faces-redirect=true"; //Fallback to current dashboard
+            }
+        } else {
+            //proper error handling and return
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed", "Invalid username or password."));
+            return null;
+        }
+
+    }
+
+
+
     /**
      * Validates the provided password against the stored password.
      * Supports both plain text (for backward compatibility) and BCrypt hashed passwords.
@@ -184,6 +234,13 @@ public class LoginBean implements Serializable {
 
             // Redirect to login page
             return "login?faces-redirect=true";
+
+            // Redirect to login page
+            return "login?faces-redirect=true";
+            // Redirect to login page
+            String contextPath = facesContext.getExternalContext().getRequestContextPath();
+            return "/login.xhtml?faces-redirect=true";
+
         } catch (Exception e) {
             e.printStackTrace();
             FacesContext.getCurrentInstance().addMessage(null,
@@ -212,6 +269,59 @@ public class LoginBean implements Serializable {
     public void initializeAdmin() {
         InitializeAdminService adminService = new InitializeAdminService();
         adminService.init();
+
+    public void initializeAdmin() {
+        InitializeAdminService adminService = new InitializeAdminService();
+        adminService.init();
+    public void checkSystemAdminAccess() {
+        if (currentUser == null || !ROLE_SYSTEM_ADMIN.equals(currentUser.getRole().getRoleName())) {
+            try {
+                String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+                FacesContext.getCurrentInstance().getExternalContext().redirect(contextPath + "/login.xhtml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void checkDoctorAccess() {
+        if (currentUser == null || !ROLE_DOCTOR.equals(currentUser.getRole().getRoleName())) {
+            try {
+                String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+                FacesContext.getCurrentInstance().getExternalContext().redirect(contextPath + "/login.xhtml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void checkReceptionistAccess() {
+        if (currentUser == null || !ROLE_RECEPTIONIST.equals(currentUser.getRole().getRoleName())) {
+            try {
+                String contextPath = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+                FacesContext.getCurrentInstance().getExternalContext().redirect(contextPath + "/login.xhtml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void preventBackdoorAccess() {
+        FacesContext context = FacesContext.getCurrentInstance() ;
+        HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+
+        //set headers to prevent caching
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+        response.setHeader("Pragma", "no-cache");
+        response.setDateHeader("Expires", 0); // Proxies
+
+        checkLogin(); //redirect to login if not logged in
+    }
+
+    public void initializeAdmin() {
+//        InitializeAdminService adminService = new InitializeAdminService();
+        initializeAdminService.init();
+
     }
 }
 

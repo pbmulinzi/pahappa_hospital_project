@@ -5,11 +5,24 @@ import com.pahappa.hospital.enums.Speciality;
 import com.pahappa.hospital.models.Doctor;
 import com.pahappa.hospital.services.DoctorService;
 import jakarta.annotation.PostConstruct;
+
+import com.pahappa.hospital.services.DoctorService;
+import jakarta.annotation.PostConstruct;
+import com.pahappa.hospital.services.auditLog.AuditLogService;
+import com.pahappa.hospital.services.doctor.DoctorService;
+import jakarta.annotation.PostConstruct;
+import jakarta.el.MethodExpression;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import java.io.Serializable;
 import java.util.Arrays;
+
+import java.util.Comparator;
+
 import java.util.List;
 
 @Named("doctorBean")
@@ -32,6 +45,15 @@ public class DoctorBean implements Serializable {
     public void init() {
         this.doctor = new Doctor();
         this.doctorList = doctorService.getAllDoctors();
+
+    @Inject
+    private AuditLogService auditLogService;
+
+    @PostConstruct
+    public void init() {
+        this.doctor = new Doctor();
+        this.doctorList = doctorService.getAllActiveDoctors();
+
         this.allShifts = Arrays.asList(Shift.values());
         this.allSpecialities = Arrays.asList(Speciality.values());
     }
@@ -47,6 +69,26 @@ public class DoctorBean implements Serializable {
             init();
         } catch (IllegalStateException e) {
             System.err.println("Scheduling conflict: " + e.getMessage());
+
+    public String saveDoctor() {
+        try {
+            if (doctor.getDoctorId() == null) {
+                doctorService.createDoctor(doctor);
+                // After creating a doctor
+                auditLogService.logAction("DOCTOR_CREATE", "Created doctor: " + doctor.getDoctorFirstName() + " " + doctor.getDoctorLastName());
+            } else {
+                doctorService.updateDoctor(doctor);
+                // After updating a doctor
+                auditLogService.logAction("DOCTOR_UPDATE", "Updated doctor: " + doctor.getDoctorFirstName() + " " + doctor.getDoctorLastName());
+            }
+            doctor = new Doctor();
+            init();
+
+            return "doctor.xhtml?faces-redirect=true";
+        } catch (IllegalStateException e) {
+            System.err.println("Scheduling conflict: " + e.getMessage());
+            return null;
+
         }
     }
 
@@ -72,6 +114,24 @@ public class DoctorBean implements Serializable {
     public void deleteDoctor(Long doctorId) {
         doctorService.softDeleteDoctor(doctorId);
         init();
+
+        doctorService.softDeleteDoctor(doctorId);
+        init();
+        try {
+            doctorService.softDeleteDoctor(doctorId);
+            auditLogService.logAction("DOCTOR_DELETE", "Deleted doctor with ID: " + doctorId);
+            init();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+                    "Success", "Doctor deleted successfully"));
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+                    "Failed to delete doctor: " + e.getMessage()));
+        }
+    }
+
+    public void setDoctorForDeletion(Long doctorId) {
+        this.selectedDoctorId = doctorId;
+
     }
 
     public void searchDoctorByName() {
@@ -95,10 +155,42 @@ public class DoctorBean implements Serializable {
             doctorList = doctorService.findDoctorsBySpeciality(searchSpeciality);
         } else if (searchQuery != null && !searchQuery.trim().isEmpty()) {
             doctorList = doctorService.searchDoctorsByName(searchQuery);
+
+    public Doctor findDoctorById(Long id) {
+        for (Doctor doc : doctorList) {
+            if (doc.getDoctorId().equals(id)) {
+                return doc;
+            }
+        }
+        return null;
+    }
+
+    public void confirmDeleteDoctor(Long doctorId) {
+        doctorService.softDeleteDoctor(doctorId);
+        auditLogService.logAction("DOCTOR_DELETE", "Soft deleted doctor with ID: " + doctorId);
+        init();
+    }
+
+    public void filterQuery() {
+        if (searchSpeciality != null) {
+            searchQuery = null;
+            doctorList = doctorService.findDoctorsBySpeciality(searchSpeciality);
+            searchSpeciality = null;
+        } else if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            searchSpeciality = null;
+            doctorList = doctorService.searchDoctorsByName(searchQuery);
+            searchQuery = null;
+
         } else {
             init();
         }
     }
+
+
+    public void searchDoctors() {
+        filterQuery();
+    }
+
 
     // Getters and Setters
     public Doctor getDoctor() {
@@ -110,6 +202,8 @@ public class DoctorBean implements Serializable {
     }
 
     public List<Doctor> getDoctorList() {
+
+        doctorList.sort(Comparator.comparing(Doctor::getDoctorId).reversed());
         return doctorList;
     }
 
