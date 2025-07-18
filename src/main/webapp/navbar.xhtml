@@ -6,54 +6,96 @@
       xmlns:ui="jakarta.faces.facelets">
 
 <ui:composition>
+
+
+
     <nav class="bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-200 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo/Brand -->
-                <div class="flex items-center">
-                    <h:link outcome="dashboard" class="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                <div class="flex-shrink-0">
+                    <h3 class="text-2xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                         Pahappa HMS
-                    </h:link>
-                </div>
-
-                <!-- Navigation Links -->
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <h:link outcome="dashboard" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Dashboard
-                        </h:link>
-                        <h:link outcome="doctor" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Doctors
-                        </h:link>
-                        <h:link outcome="patient" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Patients
-                        </h:link>
-                        <h:link outcome="appointment" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Appointments
-                        </h:link>
-                        <h:link outcome="billing" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">
-                            Billing
-                        </h:link>
-                    </div>
+                    </h3>
                 </div>
 
                 <!-- User Menu -->
+                <div class="flex-1 flex justify-center space-x-4">
+
+                    <!--dashboard link: Only for System Administrators -->
+                    <h:link outcome="/dashboardTemplates/systemAdminDashboard.xhtml"
+                            rendered="#{loginBean.currentUser.role.roleName eq 'System_Administrator'}"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        Dashboard
+                    </h:link>
+
+                    <!-- Dashboard link: Only for Receptionists -->
+                    <h:link outcome="/dashboardTemplates/receptionistDashboard.xhtml"
+                            rendered="#{loginBean.currentUser.role.roleName eq 'Receptionist'}"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        Dashboard
+                    </h:link>
+
+                    <!-- Dashboard link: Only for Doctors -->
+                    <h:link outcome="/dashboardTemplates/doctorDashboard.xhtml"
+                            rendered="#{loginBean.currentUser.role.roleName eq 'Doctor'}"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        Dashboard
+                    </h:link>
+
+                    <!-- Doctors: Only for System Administrators -->
+                    <h:link outcome="/doctor.xhtml"
+                            rendered="#{loginBean.currentUser.role.roleName eq 'System_Administrator'}"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        Doctors
+                    </h:link>
+
+                    <!-- Patients: All roles -->
+                    <h:link outcome="/patient.xhtml"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        Patients
+                    </h:link>
+
+                    <!-- Appointments: Not for System Administrators -->
+                    <h:link outcome="/appointment.xhtml"
+                            rendered="#{loginBean.currentUser.role.roleName ne 'System_Administrator'}"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        Appointments
+                    </h:link>
+
+                    <!-- auditlog: Only for System Administrators -->
+                    <h:link outcome="/auditLog.xhtml"
+                            rendered="#{loginBean.currentUser.role.roleName eq 'System_Administrator'}"
+                            class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+                        AuditLog
+                    </h:link>
+
+                </div>
+
+
                 <div class="flex items-center space-x-4">
-                    <div class="hidden md:block">
-                        <span class="text-gray-700 text-sm">Welcome, <span class="font-semibold text-blue-600">#{loginBean.currentUser.username}</span></span>
-                    </div>
+
+                    <!-- Welcome Message -->
+                    <span class="text-gray-700 text-sm">
+                        Welcome, <span class="font-semibold text-blue-600">#{loginBean.currentUser.username}</span>
+                    </span>
 
                     <!-- Logout Button -->
                     <h:form>
                         <p:commandButton
                                 value="Logout"
                                 action="#{loginBean.logout}"
-                                styleClass="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 shadow-sm"
+                                ajax="false"
+                                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                border: 1.5px solid #667eea; color: white; padding: 8px 18px;
+                                font-size: 15px; border-radius: 8px; min-width: unset; min-height: unset;
+                                box-shadow: 0 4px 16px rgba(102,126,234,0.18);"
+                                styleClass="font-medium transition-all duration-200 shadow-sm h-10 w-28 items-center flex justify-center"
                                 icon="pi pi-sign-out" />
                     </h:form>
                 </div>
 
-                <!-- Mobile menu button -->
+                <!-- Mobile menu button: smaller screens -->
                 <div class="md:hidden">
                     <button type="button" class="text-gray-700 hover:text-blue-600 focus:outline-none focus:text-blue-600" onclick="toggleMobileMenu()">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,21 +109,34 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t border-gray-200">
-                <h:link outcome="dashboard" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
-                    Dashboard
-                </h:link>
-                <h:link outcome="doctor" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+
+                <!-- Doctors: Only for System Administrators -->
+                <h:link outcome="/doctor.xhtml"
+                        rendered="#{loginBean.currentUser.role.roleName eq 'System_Administrator'}"
+                        class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     Doctors
                 </h:link>
-                <h:link outcome="patient" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+
+                <!-- Patients: All roles -->
+                <h:link outcome="/patient.xhtml"
+                        class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     Patients
                 </h:link>
-                <h:link outcome="appointment" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+
+                <!-- Appointments: Not for System Administrators -->
+                <h:link outcome="/appointment.xhtml"
+                        rendered="#{loginBean.currentUser.role.roleName ne 'System_Administrator'}"
+                        class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     Appointments
                 </h:link>
-                <h:link outcome="billing" class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
+
+                <!-- Billing: Only for Receptionists -->
+                <h:link outcome="/billing.xhtml"
+                        rendered="#{loginBean.currentUser.role.roleName eq 'Receptionist'}"
+                        class="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium">
                     Billing
                 </h:link>
+
                 <div class="border-t border-gray-200 pt-2">
                     <div class="px-3 py-2">
                         <span class="text-gray-700 text-sm">Welcome, <span class="font-semibold text-blue-600">#{loginBean.currentUser.username}</span></span>

@@ -5,7 +5,6 @@
       xmlns:p="http://primefaces.org/ui">
 
 <h:head>
-
     <meta charset="UTF-8"/>
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
@@ -13,65 +12,335 @@
     <title>Login - Pahappa HMS</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
 
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap');
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
         body {
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             background-attachment: fixed;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        /* Animated background particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .particle:nth-child(1) { left: 20%; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 80%; animation-delay: 1s; }
+        .particle:nth-child(3) { left: 40%; animation-delay: 2s; }
+        .particle:nth-child(4) { left: 60%; animation-delay: 3s; }
+        .particle:nth-child(5) { left: 10%; animation-delay: 4s; }
+        .particle:nth-child(6) { left: 90%; animation-delay: 5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 1; }
+            33% { transform: translateY(-30px) rotate(120deg); opacity: 0.8; }
+            66% { transform: translateY(-20px) rotate(240deg); opacity: 0.6; }
+        }
+
+        /* Modern glassmorphism card */
         .login-card {
-            backdrop-filter: blur(10px);
-            background: rgba(255, 255, 255, 0.88);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-        .login-btn {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: 10;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
         }
+
+        .login-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Enhanced input styling */
+        .modern-input {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid rgba(103, 126, 234, 0.2);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .modern-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+        }
+
+        .modern-input::placeholder {
+            color: rgba(107, 114, 128, 0.6);
+        }
+
+        /* Revolutionary button design */
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 32px;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
         .login-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
             transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
-            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Icon styling */
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            opacity: 0.7;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        /* Logo animation */
+        .logo-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Loading animation */
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Message styling */
+        .message-container {
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-info {
+            background: rgba(59, 130, 246, 0.1);
+            border-left-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .message-error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: #ef4444;
+            color: #dc2626;
+        }
+
+        /* Responsive design */
+        @media (max-width: 640px) {
+            .login-card {
+                margin: 20px;
+                padding: 24px;
+            }
+
+            .logo-text {
+                font-size: 2.5rem;
+            }
+        }
+
+        /* Enhanced focus states */
+        .modern-label {
+            color: #374151;
+            font-weight: 500;
+            margin-bottom: 8px;
+            display: block;
+            transition: color 0.3s ease;
+        }
+
+        .input-group:focus-within .modern-label {
+            color: #667eea;
+        }
+
+        /* Subtle animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in-delayed {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .fade-in-more-delayed {
+            animation: fadeIn 1s ease-out;
         }
     </style>
 </h:head>
 
 <h:body class="min-h-screen flex items-center justify-center p-4">
+
+    <f:event type="preRenderView" listener="#{loginBean.preventBackdoorAccess}" />
+
+    <!-- Animated background particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
     <div class="w-full max-w-md">
-        <div class="login-card rounded-2xl p-8 md:p-10">
+        <div class="login-card rounded-3xl p-8 md:p-10 fade-in">
             <h:form>
                 <f:event type="preRenderComponent" listener="#{loginBean.initializeAdmin()}"/>
-                <h1 class="text-4xl font-extrabold mb-3 text-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">Pahappa HMS</h1>
-                <p class="text-lg text-center text-gray-600 mb-8">Sign into your account</p>
 
-                <!-- Messages with better styling -->
-                <p:messages id="messages" showDetail="true" closable="true"
-                            styleClass="mb-6 rounded-lg"
-                            infoClass="p-message-info bg-blue-100 border-blue-300 text-blue-700"
-                            errorClass="p-message-error bg-red-100 border-red-300 text-red-700"/>
+                <!-- Logo and title -->
+                <div class="text-center mb-8 fade-in-delayed">
+                    <h1 class="logo-text text-4xl md:text-5xl font-bold mb-3">Pahappa HMS</h1>
+                    <p class="text-gray-600 text-lg">Welcome! Please sign in to your account</p>
+                </div>
 
-                <div class="space-y-6">
-                    <div>
-                        <p:outputLabel for="username" value="Username" class="block font-medium mb-1 text-gray-700"/>
+                <!-- Messages with modern styling -->
+                <div class="fade-in-delayed">
+                    <p:messages id="messages" showDetail="true" closable="true"
+                                styleClass="message-container"
+                                infoClass="message-info"
+                                errorClass="message-error"/>
+                </div>
+
+                <div class="space-y-6 fade-in-more-delayed">
+                    <!-- Username field -->
+                    <div class="input-group">
+                        <label for="username" class="modern-label">Username</label>
                         <p:inputText id="username" value="#{loginBean.username}" required="true"
                                      placeholder="Enter your username"
-                                     styleClass="w-full border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"/>
+                                     styleClass="modern-input w-full"/>
+                        <i class="input-icon" data-lucide="user"></i>
                     </div>
-                    <div>
-                        <p:outputLabel for="password" value="Password" class="block font-medium mb-1 text-gray-700"/>
+
+                    <!-- Password field -->
+                    <div class="input-group">
+                        <label for="password" class="modern-label">Password</label>
                         <p:password id="password" value="#{loginBean.password}" required="true" feedback="false"
                                     placeholder="Enter your password"
-                                    styleClass="w-full border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white"/>
+                                    styleClass="modern-input w-full"
+                                    toggleMask="true"/>
+                        <i class="input-icon" data-lucide="lock"></i>
                     </div>
                 </div>
-                <div class="flex justify-end mt-8">
-                    <p:commandButton id="loginButton" value="Login" action="#{loginBean.login}"
-                                     styleClass="login-btn text-white font-bold py-3 px-8 rounded-lg shadow-md" />
+
+                <!-- Login button -->
+                <div class="mt-8 fade-in-more-delayed">
+                    <p:commandButton id="loginButton" value="Sign In" action="#{loginBean.login}"
+                                     styleClass="login-btn w-full"
+                                     onclick="this.querySelector('.loading-spinner').style.display='inline-block'"
+                                     oncomplete="this.querySelector('.loading-spinner').style.display='none'">
+                        <span class="loading-spinner"></span>
+                    </p:commandButton>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-6 text-center text-sm text-gray-500 fade-in-more-delayed">
+                    <p>Secure access to your healthcare management system</p>
                 </div>
             </h:form>
         </div>
     </div>
+
+
 </h:body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
 

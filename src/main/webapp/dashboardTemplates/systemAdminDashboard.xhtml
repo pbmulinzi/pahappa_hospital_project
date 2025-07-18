@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard - Pahappa HMS</title>
+    <!-- Reuse your existing head content -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio,line-clamp"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+    <style>
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+        .icon-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</h:head>
+<h:body class="min-h-screen bg-gradient-to-br from-blue-500 via-purple-400 to-pink-300">
+
+    <f:event type="preRenderView" listener="#{loginBean.preventBackdoorAccess}" />
+
+    <!-- Reused Navigation -->
+    <ui:include src="/navbar.xhtml"/>
+
+    <f:event type="preRenderView" listener="#{loginBean.checkSystemAdminAccess}" />
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- Welcome Card (Adapted for Admin) -->
+        <div class="bg-white/90 rounded-2xl shadow-2xl p-8 mb-8">
+            <h1 class="text-4xl font-extrabold mb-2 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+                Administrator Dashboard
+            </h1>
+            <p class="text-center text-gray-600">
+                <i class="fas fa-shield-alt mr-2"></i>System Management Portal
+            </p>
+        </div>
+
+        <!-- Admin-Specific Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <p:panel rendered="#{loginBean.currentUser.role.roleName eq 'System_Administrator'}" class="card-hover gradient-border"
+                     styleClass="bg-white/90 rounded-xl shadow-xl p-6 backdrop-blur-md border border-white/30 card-hover">
+                <!-- Doctor Management Card -->
+                <div class="flex items-center mb-4">
+                    <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-3 rounded-full mr-4 relative">
+                        <i class="fas fa-user-md text-xl"></i>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full icon-pulse"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Doctors</h3>
+                        <span class="text-xs text-blue-600 font-medium bg-blue-100 px-2 py-1 rounded-full">Doctor Management</span>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">Manage doctor profiles and schecules.</p>
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <i class="fas fa-stethoscope mr-2 text-blue-500"></i>
+                    <span>Medical Professionals</span>
+                </div>
+                <h:form>
+                    <p:button value="Manage Doctors" outcome="/doctor.xhtml" styleClass="w-full p-button-lg"
+                              style="background: linear-gradient(135deg, #3B82F6, #2563EB); border: none; color: white;"
+                              icon="fas fa-user-md" />
+                </h:form>
+            </p:panel>
+
+            <div class="bg-white/90 rounded-xl shadow-xl p-6 backdrop-blur-md border border-white/30 card-hover">
+                <div class="flex items-center mb-4">
+                    <div class="bg-gradient-to-r from-green-500 to-green-600 text-white p-3 rounded-full mr-4 relative">
+                        <i class="fas fa-user-injured text-xl"></i>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full icon-pulse"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Patients</h3>
+                        <span class="text-xs text-green-600 font-medium bg-green-100 px-2 py-1 rounded-full">Patient Care</span>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">Register and manage patient information and history</p>
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <i class="fas fa-heart mr-2 text-green-500"></i>
+                    <span>Healthcare Registry</span>
+                </div>
+                <h:form>
+                    <p:button value="Manage Patients" outcome="/patient.xhtml" styleClass="w-full p-button-lg"
+                              style="background: linear-gradient(135deg, #10B981, #059669); border: none; color: white;"
+                              icon="fas fa-user-injured" />
+                </h:form>
+            </div>
+
+
+            <p:panel rendered="#{loginBean.currentUser.role.roleName == 'System_Administrator'}"
+                     styleClass="bg-white/90 rounded-xl shadow-xl p-6 backdrop-blur-md border border-white/30 card-hover">
+                <!-- AuditLog Management Card -->
+                <div class="flex items-center mb-4">
+                    <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white p-3 rounded-full mr-4 relative">
+                        <i class="fas fa-clipboard-list text-xl"></i>
+                        <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full icon-pulse"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-800">Audit Logs</h3>
+                        <span class="text-xs text-amber-600 font-medium bg-amber-100 px-2 py-1 rounded-full">System Monitoring</span>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">Monitor system activities, track changes, and maintain security logs</p>
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <i class="fas fa-shield-alt mr-2 text-amber-500"></i>
+                    <span>Security and Compliance</span>
+                </div>
+                <h:form>
+                    <p:button value="View Audit Logs" outcome="/auditLog.xhtml" styleClass="w-full p-button-lg"
+                              style="background: linear-gradient(135deg, #F59E0B, #D97706); border: none; color: white;"
+                              icon="fas fa-clipboard-list" />
+                </h:form>
+            </p:panel>
+        </div>
+    </div>
+</h:body>
+</html>
