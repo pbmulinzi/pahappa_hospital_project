@@ -1,7 +1,12 @@
 package com.pahappa.hospital.daos;
 
 import com.pahappa.hospital.models.Doctor;
+<<<<<<< Updated upstream
 import com.pahappa.hospital.utils.HibernateUtil;
+=======
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+>>>>>>> Stashed changes
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -10,9 +15,21 @@ import org.hibernate.query.Query;
 import java.io.Serializable;
 import java.util.List;
 
+<<<<<<< Updated upstream
 public class DoctorDao implements Serializable {
 
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+=======
+
+@ApplicationScoped
+public class DoctorDao implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    private SessionFactory sessionFactory;
+
+>>>>>>> Stashed changes
 
     // Create a new doctor
     public void createDoctor(Doctor doctor) {

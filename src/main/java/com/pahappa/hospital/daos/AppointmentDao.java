@@ -5,6 +5,11 @@ import com.pahappa.hospital.models.Appointment;
 import com.pahappa.hospital.models.Doctor;
 import com.pahappa.hospital.models.Patient;
 import com.pahappa.hospital.utils.HibernateUtil;
+<<<<<<< Updated upstream
+=======
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+>>>>>>> Stashed changes
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -15,9 +20,17 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+<<<<<<< Updated upstream
 public class AppointmentDao {
 
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+=======
+@ApplicationScoped
+public class AppointmentDao {
+
+    @Inject
+    private SessionFactory sessionFactory;
+>>>>>>> Stashed changes
 
     // Create new appointment
     public void createAppointment(Appointment appointment) {
@@ -70,7 +83,11 @@ public class AppointmentDao {
 
 
     // Get appointment by ID (excluding deleted)
+<<<<<<< Updated upstream
     public Appointment getAppointmentById(int appointmentId) {
+=======
+    public Appointment getAppointmentById(Long appointmentId) {
+>>>>>>> Stashed changes
         try (Session session = sessionFactory.openSession()) {
             Query<Appointment> query = session.createQuery(
                     "FROM Appointment a WHERE a.id = :id AND a.deleted = false",
@@ -82,6 +99,7 @@ public class AppointmentDao {
     }
 
 
+<<<<<<< Updated upstream
 //    public Appointment getAppointmentById(int appointmentId) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deletedAppointmentFilter")
@@ -90,6 +108,8 @@ public class AppointmentDao {
 //        }
 //    }
 
+=======
+>>>>>>> Stashed changes
     // Get all non-deleted appointments
     public List<Appointment> getAllActiveAppointments() {
         try (Session session = sessionFactory.openSession()) {
@@ -137,6 +157,7 @@ public class AppointmentDao {
 
 
 
+<<<<<<< Updated upstream
 //    public List<Appointment> getAppointmentsByPatient(Patient patient) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deletedAppointmentFilter")
@@ -149,6 +170,8 @@ public class AppointmentDao {
 //            return query.list();
 //        }
 //    }
+=======
+>>>>>>> Stashed changes
 
     // Get appointments by doctor
     public List<Appointment> getAppointmentsByDoctor(Doctor doctor) {
@@ -163,6 +186,7 @@ public class AppointmentDao {
     }
 
 
+<<<<<<< Updated upstream
 //    public List<Appointment> getAppointmentsByDoctor(Doctor doctor) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deletedAppointmentFilter")
@@ -176,6 +200,8 @@ public class AppointmentDao {
 //        }
 //    }
 
+=======
+>>>>>>> Stashed changes
     // Get appointments by status
     public List<Appointment> getAppointmentsByStatus(AppointmentStatus status) {
         try (Session session = sessionFactory.openSession()) {
@@ -189,6 +215,7 @@ public class AppointmentDao {
     }
 
 
+<<<<<<< Updated upstream
 //    public List<Appointment> getAppointmentsByStatus(AppointmentStatus status) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deletedAppointmentFilter")
@@ -204,6 +231,10 @@ public class AppointmentDao {
 
     // Get appointments by date range
     public List<Appointment> getAppointmentsByDateRange(LocalDateTime start, LocalDateTime end) {
+=======
+    // Get appointments by date range
+    public List<Appointment> getAppointmentsByDateRange(LocalDate start, LocalDate end) {
+>>>>>>> Stashed changes
         try (Session session = sessionFactory.openSession()) {
             Query<Appointment> query = session.createQuery(
                     "FROM Appointment a WHERE a.appointmentDate BETWEEN :start AND :end AND a.deleted = false",
@@ -216,6 +247,7 @@ public class AppointmentDao {
     }
 
 
+<<<<<<< Updated upstream
 //    public List<Appointment> getAppointmentsByDateRange(LocalDateTime start, LocalDateTime end) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deletedAppointmentFilter")
@@ -229,6 +261,8 @@ public class AppointmentDao {
 //            return query.list();
 //        }
 //    }
+=======
+>>>>>>> Stashed changes
 
     // Get appointments for a specific date
     public List<Appointment> getAppointmentsByDate(LocalDate date) {
@@ -240,9 +274,12 @@ public class AppointmentDao {
             query.setParameter("date", date);
             return query.list();
         }
+<<<<<<< Updated upstream
 //        LocalDateTime start = date.atStartOfDay();
 //        LocalDateTime end = date.plusDays(1).atStartOfDay();
 //        return getAppointmentsByDateRange(start, end);
+=======
+>>>>>>> Stashed changes
     }
 
     // Check for conflicting appointments
@@ -265,6 +302,7 @@ public class AppointmentDao {
     }
 
 
+<<<<<<< Updated upstream
 //    public boolean hasConflictingAppointment(Doctor doctor, LocalDateTime dateTime) {
 //        try (Session session = sessionFactory.openSession()) {
 //            session.enableFilter("deleteAppointmentFilter")
@@ -284,6 +322,8 @@ public class AppointmentDao {
 //            return count != null && count > 0;
 //        }
 //    }
+=======
+>>>>>>> Stashed changes
 
     private List<AppointmentStatus> getCancelledStatuses() {
         return Arrays.asList(
@@ -291,6 +331,7 @@ public class AppointmentDao {
                 AppointmentStatus.NO_SHOW
         );
     }
+<<<<<<< Updated upstream
 
 
 //    public boolean hasConflictingAppointment(Doctor doctor, LocalDateTime dateTime) {
@@ -310,4 +351,6 @@ public class AppointmentDao {
 //            return query.uniqueResult() > 0;
 //        }
 //    }
+=======
+>>>>>>> Stashed changes
 }

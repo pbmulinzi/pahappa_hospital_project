@@ -1,21 +1,35 @@
 package com.pahappa.hospital.daos;
 
 import com.pahappa.hospital.models.User;
+<<<<<<< Updated upstream
 import com.pahappa.hospital.utils.HibernateUtil;
 import jakarta.enterprise.context.ApplicationScoped;
+=======
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+>>>>>>> Stashed changes
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import java.io.Serializable;
+<<<<<<< Updated upstream
+=======
+import java.util.Collections;
+>>>>>>> Stashed changes
 import java.util.List;
 
 @ApplicationScoped
 public class UserDao implements Serializable {
     private static final long serialVersionUID = 1L;
 
+<<<<<<< Updated upstream
     private final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+=======
+    @Inject
+    private SessionFactory sessionFactory;
+>>>>>>> Stashed changes
 
     public void createUser(User user) {
         if (user == null) {
@@ -57,7 +71,11 @@ public class UserDao implements Serializable {
 
     public List<User> getUserByUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
+<<<<<<< Updated upstream
             return null;
+=======
+            return Collections.emptyList();
+>>>>>>> Stashed changes
         }
 
         try (Session session = sessionFactory.openSession()) {
@@ -66,7 +84,11 @@ public class UserDao implements Serializable {
             return query.list();
         } catch (Exception e) {
             e.printStackTrace();
+<<<<<<< Updated upstream
             return null;
+=======
+            return Collections.emptyList();
+>>>>>>> Stashed changes
         }
     }
 
