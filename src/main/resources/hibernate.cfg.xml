@@ -16,6 +16,7 @@
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
 
         <!-- Echo executed SQL to stdout -->
+        <property name="hibernate.format_sql">true</property>
         <property name="hibernate.show_sql">false</property>
 
         <!-- Update database schema on startup -->
@@ -28,6 +29,8 @@
         <mapping class="com.pahappa.hospital.models.Appointment"/>
         <mapping class="com.pahappa.hospital.models.Billing"/>
         <mapping class="com.pahappa.hospital.models.MedicalRecord"/>
-        <mapping class="com.pahappa.hospital.models.Staff"/>
+        <mapping class="com.pahappa.hospital.models.AuditLog"/>
+        <mapping class="com.pahappa.hospital.models.Role"/>
+
     </session-factory>
 </hibernate-configuration>
